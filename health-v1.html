@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="心不全手帳">
+<meta name="theme-color" content="#e8615a">
+<title>心不全健康管理手帳</title>
+<style>
+:root{
+  --pink-bg:#fdeef0;
+  --pink-tile:#f7d9dd;
+  --pink-deep:#e8615a;
+  --pink-soft:#f4a9a4;
+  --header-pink:#ef8a86;
+  --yellow-sig:#f5c518;
+  --yellow-bg:#fdf6d8;
+  --red-sig:#e23b2e;
+  --red-bg:#fbe0dd;
+  --green-ok:#34a853;
+  --green-bg:#e3f3e6;
+  --blue-head:#5b9bd5;
+  --blue-deep:#2e6da4;
+  --pillar-life:#f6d0b8;
+  --pillar-exercise:#cbe8d4;
+  --pillar-food:#fbeec2;
+  --pillar-med:#bcd6ec;
+  --ink:#33302e;
+  --ink-soft:#6b6663;
+  --line:#e3dcd8;
+  --card:#ffffff;
+  --shadow:0 2px 12px rgba(180,120,120,.14);
+  --radius:16px;
+  --maxw:560px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+  background:var(--pink-bg);
+  color:var(--ink);
+  line-height:1.7;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:none;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 14px;}
+
+/* ---------- App header ---------- */
+.app-header{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(135deg,var(--pink-deep),var(--header-pink));
+  color:#fff;
+  padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;
+  box-shadow:0 2px 10px rgba(200,90,90,.25);
+}
+.app-header .inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:10px;}
+.app-header h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.02em;flex:1;}
+.app-header .heart{font-size:22px;}
+.rank-badge{
+  background:rgba(255,255,255,.22);
+  border:1.5px solid rgba(255,255,255,.5);
+  border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;
+  white-space:nowrap;display:flex;align-items:center;gap:5px;
+}
+
+/* ---------- Screens ---------- */
+.screen{display:none;animation:fade .25s ease;}
+.screen.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.pad{padding-top:16px;}
+
+/* ---------- Bottom nav ---------- */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:#fff;border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  box-shadow:0 -2px 12px rgba(180,120,120,.10);
+}
+.tabbar button{
+  background:none;border:none;flex:1;padding:6px 2px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--ink-soft);font-size:10.5px;font-weight:600;cursor:pointer;
+  transition:color .15s;
+}
+.tabbar button .ic{font-size:21px;line-height:1;}
+.tabbar button.on{color:var(--pink-deep);}
+
+/* ---------- Cards & common ---------- */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;}
+.card h2{font-size:16px;margin:0 0 10px;color:var(--pink-deep);font-weight:800;display:flex;align-items:center;gap:7px;}
+.card h3{font-size:14px;margin:14px 0 6px;color:var(--blue-deep);font-weight:700;}
+.section-title{font-size:15px;font-weight:800;color:var(--ink);margin:18px 2px 8px;display:flex;align-items:center;gap:7px;}
+.muted{color:var(--ink-soft);font-size:13px;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  background:var(--pink-deep);color:#fff;border:none;border-radius:12px;
+  padding:13px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%;
+  transition:transform .08s,filter .15s;
+}
+.btn:active{transform:scale(.98);}
+.btn.sub{background:#fff;color:var(--pink-deep);border:1.5px solid var(--pink-soft);}
+.btn.gray{background:#fff;color:var(--ink-soft);border:1.5px solid var(--line);}
+.btn.ghost{background:transparent;color:var(--blue-deep);border:1.5px solid var(--blue-deep);}
+.btn.small{padding:9px 14px;font-size:13px;width:auto;}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
+
+/* ---------- Form ---------- */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:var(--ink);}
+.field .hint{font-weight:400;color:var(--ink-soft);font-size:11.5px;}
+input[type=date],input[type=number],input[type=text],select,textarea{
+  width:100%;padding:12px;border:1.5px solid var(--line);border-radius:11px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pink-soft);box-shadow:0 0 0 3px rgba(244,169,164,.25);}
+.bp-row{display:flex;align-items:center;gap:8px;}
+.bp-row input{text-align:center;}
+.bp-row .slash{font-size:20px;color:var(--ink-soft);font-weight:700;}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.timeblock{border:1.5px solid var(--line);border-radius:12px;padding:11px 12px 4px;margin-bottom:12px;}
+.timeblock .tb-head{font-size:13px;font-weight:800;color:var(--pink-deep);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+
+/* symptom checkboxes */
+.symptom{
+  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
+  border:1.5px solid var(--line);margin-bottom:8px;cursor:pointer;background:#fff;
+  transition:all .12s;font-size:13.5px;
+}
+.symptom input{width:21px;height:21px;flex:none;accent-color:var(--pink-deep);}
+.symptom .lab{flex:1;font-weight:600;}
+.symptom .sig{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.symptom .sig.y{background:var(--yellow-bg);color:#b8860b;border:1px solid var(--yellow-sig);}
+.symptom .sig.r{background:var(--red-bg);color:var(--red-sig);border:1px solid var(--red-sig);}
+.symptom.checked{border-color:var(--pink-soft);background:#fff7f6;}
+.symptom.checked.yel{border-color:var(--yellow-sig);background:var(--yellow-bg);}
+.symptom.checked.red{border-color:var(--red-sig);background:var(--red-bg);}
+
+/* signal banner */
+.signal-banner{border-radius:14px;padding:14px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start;font-weight:600;}
+.signal-banner .big{font-size:26px;line-height:1;}
+.signal-banner.green{background:var(--green-bg);border:1.5px solid var(--green-ok);color:#1f7a37;}
+.signal-banner.yellow{background:var(--yellow-bg);border:1.5px solid var(--yellow-sig);color:#9a6b00;}
+.signal-banner.red{background:var(--red-bg);border:1.5px solid var(--red-sig);color:var(--red-sig);}
+.signal-banner b{display:block;font-size:15px;margin-bottom:2px;}
+
+/* ---------- Knowledge ---------- */
+.k-hero{
+  background:linear-gradient(135deg,#fff,var(--pink-bg));
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;text-align:center;
+  box-shadow:var(--shadow);
+}
+.k-hero .mascot{font-size:42px;}
+.k-hero h2{color:var(--pink-deep);margin:6px 0 4px;font-size:19px;}
+.k-list{list-style:none;padding:0;margin:0;}
+.k-item{
+  background:#fff;border-radius:13px;box-shadow:var(--shadow);margin-bottom:10px;
+  overflow:hidden;border-left:5px solid var(--pink-soft);
+}
+.k-item.life{border-left-color:var(--pillar-life);}
+.k-item.exercise{border-left-color:#7cc497;}
+.k-item.food{border-left-color:#e9c84a;}
+.k-item.med{border-left-color:#7eaedb;}
+.k-item.sig{border-left-color:var(--yellow-sig);}
+.k-item.acp{border-left-color:var(--blue-head);}
+.k-item-head{
+  padding:14px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;
+}
+.k-item-head .ic{font-size:24px;flex:none;width:30px;text-align:center;}
+.k-item-head .tt{flex:1;font-weight:800;font-size:14.5px;}
+.k-item-head .tt small{display:block;font-weight:500;color:var(--ink-soft);font-size:11.5px;margin-top:1px;}
+.k-item-head .arr{color:var(--ink-soft);transition:transform .2s;font-size:13px;}
+.k-item.open .k-item-head .arr{transform:rotate(90deg);}
+.k-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.k-item.open .k-body{max-height:3000px;}
+.k-body-inner{padding:0 14px 16px;font-size:13.5px;}
+.k-body-inner h4{margin:14px 0 5px;font-size:13.5px;color:var(--blue-deep);display:flex;gap:6px;align-items:center;}
+.k-body-inner ul{margin:4px 0 4px;padding-left:20px;}
+.k-body-inner li{margin-bottom:5px;}
+.k-body-inner p{margin:6px 0;}
+.callout{background:var(--pink-bg);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px;}
+.callout.warn{background:var(--yellow-bg);border:1px solid #f0dca0;}
+.pill-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:4px;}
+.pill-tag.y{background:var(--yellow-bg);color:#9a6b00;}
+.pill-tag.r{background:var(--red-bg);color:var(--red-sig);}
+
+/* 4 pillars row */
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0;}
+.pillar{border-radius:11px;padding:11px 4px;text-align:center;font-weight:800;font-size:12px;}
+.pillar .pic{font-size:22px;display:block;margin-bottom:3px;}
+.pillar.l{background:var(--pillar-life);}
+.pillar.e{background:var(--pillar-exercise);}
+.pillar.f{background:var(--pillar-food);}
+.pillar.m{background:var(--pillar-med);}
+
+/* stage diagram */
+.stages{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0;}
+.stage{border-radius:9px;padding:9px 5px;text-align:center;font-size:11px;font-weight:700;color:#fff;}
+.stage small{display:block;font-weight:400;font-size:9.5px;opacity:.92;margin-top:2px;line-height:1.3;}
+.stage.a{background:#5cb85c;}.stage.b{background:#8bc34a;}
+.stage.c{background:#f0ad4e;}.stage.d{background:#d9534f;}
+
+/* ---------- Dashboard / home ---------- */
+.hero-card{
+  background:linear-gradient(135deg,var(--pink-deep),var(--header-pink));
+  color:#fff;border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.hero-card .rk{font-size:13px;opacity:.92;}
+.hero-card .rk b{font-size:22px;display:block;margin-top:2px;}
+.hero-stats{display:flex;gap:10px;margin-top:14px;}
+.hero-stats .st{flex:1;background:rgba(255,255,255,.18);border-radius:12px;padding:10px;text-align:center;}
+.hero-stats .st .n{font-size:22px;font-weight:800;}
+.hero-stats .st .l{font-size:10.5px;opacity:.9;margin-top:1px;}
+.rank-track{display:flex;justify-content:space-between;margin-top:14px;gap:2px;}
+.rank-track .step{flex:1;text-align:center;font-size:8.5px;opacity:.55;}
+.rank-track .step .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.4);margin:0 auto 3px;}
+.rank-track .step.done{opacity:1;}
+.rank-track .step.done .dot{background:#fff;}
+.rank-track .step.cur{opacity:1;font-weight:800;}
+.rank-track .step.cur .dot{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.4);}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.qa{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:15px;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:transform .08s;}
+.qa:active{transform:scale(.97);}
+.qa .ic{font-size:26px;display:block;margin-bottom:5px;}
+.qa .t{font-weight:800;font-size:13px;color:var(--ink);}
+.qa .s{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+.qa.urgent{background:linear-gradient(135deg,#fff,var(--red-bg));border:1.5px solid var(--red-sig);}
+.qa.urgent .t{color:var(--red-sig);}
+
+/* recent list */
+.rec{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+.rec:last-child{border-bottom:none;}
+.rec .d{font-weight:800;font-size:13px;width:52px;flex:none;color:var(--ink);}
+.rec .v{flex:1;font-size:12.5px;color:var(--ink-soft);}
+.rec .v b{color:var(--ink);}
+.rec .badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;flex:none;}
+.rec .badge.g{background:var(--green-bg);color:var(--green-ok);}
+.rec .badge.y{background:var(--yellow-bg);color:#9a6b00;}
+.rec .badge.r{background:var(--red-bg);color:var(--red-sig);}
+
+/* ---------- Graph ---------- */
+.chart-box{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:14px;}
+.chart-box h3{margin:0 0 8px;font-size:14px;color:var(--ink);}
+.chart-wrap{position:relative;height:200px;}
+.range-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.range-tabs button{flex:1;padding:8px;border:1.5px solid var(--line);background:#fff;border-radius:10px;font-size:12px;font-weight:700;color:var(--ink-soft);cursor:pointer;font-family:inherit;}
+.range-tabs button.on{background:var(--pink-deep);color:#fff;border-color:var(--pink-deep);}
+
+/* ---------- Emergency share ---------- */
+#shareSheet{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px;}
+.es-head{background:linear-gradient(135deg,var(--pink-deep),var(--header-pink));color:#fff;padding:16px;}
+.es-head .nm{font-size:19px;font-weight:800;}
+.es-head .sub{font-size:12px;opacity:.92;margin-top:2px;}
+.es-body{padding:16px;}
+.es-signal{border-radius:12px;padding:13px;margin-bottom:14px;text-align:center;font-weight:800;}
+.es-signal .lv{font-size:20px;}
+.es-signal .ms{font-size:13px;font-weight:600;margin-top:3px;}
+.es-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.es-metric{background:var(--pink-bg);border-radius:12px;padding:12px;}
+.es-metric .l{font-size:11px;color:var(--ink-soft);font-weight:700;}
+.es-metric .v{font-size:19px;font-weight:800;margin-top:2px;}
+.es-metric .v small{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.es-metric .trend{font-size:11.5px;margin-top:2px;font-weight:700;}
+.es-metric .trend.up{color:var(--red-sig);}
+.es-metric .trend.flat{color:var(--green-ok);}
+.es-section{margin-bottom:14px;}
+.es-section .st{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:6px;border-left:3px solid var(--pink-deep);padding-left:8px;}
+.es-symptom-chip{display:inline-block;background:var(--yellow-bg);color:#9a6b00;border:1px solid #f0dca0;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;margin:0 4px 4px 0;}
+.es-symptom-chip.r{background:var(--red-bg);color:var(--red-sig);border-color:var(--red-sig);}
+.es-foot{font-size:10.5px;color:var(--ink-soft);text-align:center;padding:10px 16px 14px;border-top:1px solid var(--line);}
+.mini-spark{height:44px;width:100%;}
+
+/* ---------- Settings / data ---------- */
+.list-row{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.list-row:last-child{border-bottom:none;}
+.list-row .ic{font-size:20px;width:26px;text-align:center;flex:none;}
+.list-row .tx{flex:1;}
+.list-row .tx .t{font-weight:700;font-size:14px;}
+.list-row .tx .s{font-size:11.5px;color:var(--ink-soft);}
+.list-row .arr{color:var(--line);}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:rgba(40,35,33,.94);color:#fff;padding:12px 20px;border-radius:999px;font-size:13.5px;font-weight:600;
+  opacity:0;pointer-events:none;transition:all .3s;z-index:200;max-width:90%;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(40,30,30,.5);z-index:150;display:none;align-items:flex-end;justify-content:center;}
+.modal-bg.show{display:flex;animation:fade .2s;}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:var(--maxw);padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto;animation:slideup .28s ease;}
+@keyframes slideup{from{transform:translateY(100%);}to{transform:none;}}
+.modal h3{margin:0 0 4px;font-size:17px;color:var(--pink-deep);}
+.modal .close{float:right;background:none;border:none;font-size:24px;color:var(--ink-soft);cursor:pointer;line-height:1;}
+
+.empty{text-align:center;padding:40px 20px;color:var(--ink-soft);}
+.empty .ic{font-size:46px;opacity:.5;}
+.divider{height:1px;background:var(--line);margin:14px 0;}
+.update-note{background:var(--blue-deep);color:#fff;font-size:12px;padding:10px 14px;border-radius:12px;margin-bottom:14px;display:flex;gap:10px;align-items:center;}
+.update-note a{color:#fff;text-decoration:underline;font-weight:700;}
+.update-note .x{margin-left:auto;background:none;border:none;color:#fff;font-size:18px;cursor:pointer;}
+.ver{text-align:center;font-size:10.5px;color:var(--ink-soft);padding:8px;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="inner">
+    <span class="heart">♥</span>
+    <h1>心不全健康管理手帳</h1>
+    <span class="rank-badge" id="hdrRank">👤 <span id="hdrRankName">未設定</span></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ============ HOME ============ -->
+<section class="screen active" id="screen-home">
+  <div class="pad"></div>
+  <div id="updateNote"></div>
+
+  <div class="hero-card">
+    <div class="rk">あなたの記録ランク
+      <b id="heroRank">未設定</b>
+    </div>
+    <div class="hero-stats">
+      <div class="st"><div class="n" id="heroStreak">0</div><div class="l">連続記載日数</div></div>
+      <div class="st"><div class="n" id="heroTotal">0</div><div class="l">総記録日数</div></div>
+      <div class="st"><div class="n" id="heroRate">―</div><div class="l">記載率</div></div>
+    </div>
+    <div class="rank-track" id="rankTrack"></div>
+  </div>
+
+  <div class="quick-actions">
+    <button class="qa" onclick="go('record')">
+      <span class="ic">📝</span><span class="t">今日の記録</span><span class="s" id="todayDone">未記入</span>
+    </button>
+    <button class="qa" onclick="go('graph')">
+      <span class="ic">📈</span><span class="t">グラフ</span><span class="s">推移を見る</span>
+    </button>
+    <button class="qa" onclick="go('knowledge')">
+      <span class="ic">📖</span><span class="t">手帳を読む</span><span class="s">心不全の知識</span>
+    </button>
+    <button class="qa urgent" onclick="go('share')">
+      <span class="ic">🚨</span><span class="t">緊急共有</span><span class="s">家族・医療機関へ</span>
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>📋 最近の記録</h2>
+    <div id="recentList"></div>
+  </div>
+
+  <div class="card" id="baselineCard">
+    <h2>⚙️ 基本設定</h2>
+    <p class="muted" style="margin-top:0">受診の目安となる体重などを設定すると、信号判定が正確になります。</p>
+    <button class="btn sub small" onclick="openSettings()">設定を開く</button>
+  </div>
+
+  <div class="ver">心不全健康管理手帳 Web版 v1.0 ／ 群馬心不全地域連携協議会（参考）</div>
+</section>
+
+<!-- ============ RECORD ============ -->
+<section class="screen" id="screen-record">
+  <div class="pad"></div>
+  <div class="card">
+    <h2>📝 体調記録</h2>
+    <div class="field">
+      <label>日付</label>
+      <input type="date" id="recDate">
+    </div>
+
+    <div class="timeblock">
+      <div class="tb-head">🌅 朝（起床・排尿後、朝食前）</div>
+      <div class="field">
+        <label>血圧 <span class="hint">上腕で測定</span></label>
+        <div class="bp-row">
+          <input type="number" id="amSys" placeholder="上 (例:118)" inputmode="numeric">
+          <span class="slash">/</span>
+          <input type="number" id="amDia" placeholder="下 (例:58)" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label>脈拍 <span class="hint">回/分</span></label>
+        <input type="number" id="amPulse" placeholder="例: 60" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="timeblock">
+      <div class="tb-head">🌙 夕（寝る前）</div>
+      <div class="field">
+        <label>血圧</label>
+        <div class="bp-row">
+          <input type="number" id="pmSys" placeholder="上" inputmode="numeric">
+          <span class="slash">/</span>
+          <input type="number" id="pmDia" placeholder="下" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label>脈拍 <span class="hint">回/分</span></label>
+        <input type="number" id="pmPulse" placeholder="回/分" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>体重 <span class="hint">起床・排尿後、kg（小数点まで）</span></label>
+      <input type="number" step="0.1" id="weight" placeholder="例: 50.1" inputmode="decimal">
+    </div>
+
+    <div class="field">
+      <label>運動した</label>
+      <select id="exercise">
+        <option value="">―</option>
+        <option value="yes">○ した</option>
+        <option value="no">× しなかった</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🩺 今日の自覚症状</h2>
+    <p class="muted" style="margin-top:0">当てはまるものにチェック。信号は受診の目安です。</p>
+    <div id="symptomList"></div>
+  </div>
+
+  <div id="liveSignal"></div>
+
+  <div class="card">
+    <h2>🗒 その他メモ</h2>
+    <textarea id="memo" rows="2" placeholder="気になることがあれば自由に記入"></textarea>
+  </div>
+
+  <button class="btn" onclick="saveRecord()">💾 この日の記録を保存</button>
+  <div style="height:8px"></div>
+  <button class="btn gray" onclick="go('home')">キャンセル</button>
+  <div style="height:20px"></div>
+</section>
+
+<!-- ============ GRAPH ============ -->
+<section class="screen" id="screen-graph">
+  <div class="pad"></div>
+  <div class="section-title">📈 推移グラフ</div>
+  <div class="range-tabs" id="rangeTabs">
+    <button data-r="14" class="on">2週間</button>
+    <button data-r="30">1ヶ月</button>
+    <button data-r="90">3ヶ月</button>
+    <button data-r="0">全期間</button>
+  </div>
+  <div id="graphArea"></div>
+</section>
+
+<!-- ============ SHARE ============ -->
+<section class="screen" id="screen-share">
+  <div class="pad"></div>
+  <div class="section-title">🚨 緊急共有シート</div>
+  <p class="muted" style="margin:-2px 2px 12px">直近の状態を1画面にまとめます。スクリーンショットで家族・医療機関に共有できます。</p>
+  <div id="shareSheet"></div>
+  <div class="btn-row">
+    <button class="btn small" onclick="downloadShareImage()">🖼 画像で保存</button>
+    <button class="btn sub small" onclick="go('home')">戻る</button>
+  </div>
+  <div style="height:20px"></div>
+</section>
+
+<!-- ============ KNOWLEDGE ============ -->
+<section class="screen" id="screen-knowledge">
+  <div class="pad"></div>
+  <div class="k-hero">
+    <div class="mascot">🐴💗</div>
+    <h2>心不全とつきあう</h2>
+    <p class="muted" style="margin:0">心不全は一生つきあう病気です。悪化のサインに早く気づき、再入院を防ぎましょう。読みたい項目をタップ。</p>
+  </div>
+  <ul class="k-list" id="knowledgeList"></ul>
+  <div style="height:10px"></div>
+</section>
+
+<!-- ============ DATA / SETTINGS ============ -->
+<section class="screen" id="screen-data">
+  <div class="pad"></div>
+  <div class="section-title">⚙️ 設定・データ</div>
+
+  <div class="card">
+    <h2>👤 基本情報</h2>
+    <div class="field">
+      <label>お名前 <span class="hint">任意・端末内のみ保存</span></label>
+      <input type="text" id="setName" placeholder="例: 群馬 太郎">
+    </div>
+    <div class="field">
+      <label>受診すべき体重 <span class="hint">kg・主治医に確認した値</span></label>
+      <input type="number" step="0.1" id="setVisitWeight" placeholder="例: 52.0" inputmode="decimal">
+    </div>
+    <div class="field">
+      <label>ベースライン体重 <span class="hint">kg・安定時の体重（増減判定に使用）</span></label>
+      <input type="number" step="0.1" id="setBaseWeight" placeholder="例: 50.0" inputmode="decimal">
+    </div>
+    <button class="btn small" onclick="saveSettings()">設定を保存</button>
+  </div>
+
+  <div class="card">
+    <h2>💾 データの書き出し・共有</h2>
+    <p class="muted" style="margin-top:0">AirDropやLINEで共有できます。バックアップにもなります。</p>
+    <div class="list-row" onclick="exportJSON()">
+      <span class="ic">📦</span><div class="tx"><div class="t">JSONで書き出し</div><div class="s">全データ・復元用バックアップ</div></div><span class="arr">›</span>
+    </div>
+    <div class="list-row" onclick="exportCSV()">
+      <span class="ic">📊</span><div class="tx"><div class="t">CSVで書き出し</div><div class="s">Excel等で開ける表形式</div></div><span class="arr">›</span>
+    </div>
+    <div class="list-row" onclick="document.getElementById('importFile').click()">
+      <span class="ic">📥</span><div class="tx"><div class="t">JSONを読み込み</div><div class="s">バックアップから復元・追加</div></div><span class="arr">›</span>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importJSON(event)">
+  </div>
+
+  <div class="card">
+    <h2>ℹ️ このアプリについて</h2>
+    <p class="muted" style="margin-top:0;font-size:12.5px">
+      本アプリは群馬心不全地域連携協議会「心不全健康管理手帳（第四版）」を参考に作成した非公式のWeb版です。データはこの端末内（ブラウザ）のみに保存され、外部に送信されません。<br><br>
+      <b>⚠ 注意：</b>iPhoneのSafariなどでは、長期間アプリを開かないと端末側の都合で保存データが消える場合があります。大切な記録は定期的にJSONで書き出して保管してください。<br><br>
+      医療上の判断は必ず主治医・かかりつけ医にご相談ください。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>🗑 データ消去</h2>
+    <button class="btn gray small" onclick="confirmReset()">すべての記録を消去</button>
+  </div>
+  <div class="ver">v1.0 ／ 単一ファイル版</div>
+  <div style="height:10px"></div>
+</section>
+
+</main>
+
+<!-- ============ TABBAR ============ -->
+<nav class="tabbar">
+  <button data-tab="home" class="on" onclick="go('home')"><span class="ic">🏠</span>ホーム</button>
+  <button data-tab="record" onclick="go('record')"><span class="ic">📝</span>記録</button>
+  <button data-tab="graph" onclick="go('graph')"><span class="ic">📈</span>グラフ</button>
+  <button data-tab="knowledge" onclick="go('knowledge')"><span class="ic">📖</span>手帳</button>
+  <button data-tab="data" onclick="go('data')"><span class="ic">⚙️</span>設定</button>
+</nav>
+
+<div id="toast"></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalContent"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ============================================================
+   心不全健康管理手帳 Web版 v1.0  —  app logic
+   データは LocalStorage のみ。外部送信なし。
+   ============================================================ */
+
+const STORE_KEY = 'hf_techo_v1';   // バージョン別キー（上書き防止）
+const APP_VER   = '1.0';
+
+/* ---------- 症状定義（手帳の信号システムに準拠） ---------- */
+const SYMPTOMS = [
+  {id:'weightGain', label:'急に体重が増えた（3日で2kg以上）', sig:'y'},
+  {id:'edema',      label:'むくんできた', sig:'y'},
+  {id:'dyspnea',    label:'いつもより息切れが強い', sig:'y'},
+  {id:'palpitation',label:'動悸がする', sig:'y'},
+  {id:'fatigue',    label:'疲れやすい・だるい', sig:'y'},
+  {id:'appetite',   label:'食欲が落ちた・お腹が張る', sig:'y'},
+  {id:'nocturia',   label:'夜間にトイレが近い', sig:'y'},
+  {id:'cold',       label:'手足が冷える', sig:'y'},
+  {id:'orthopnea',  label:'寝ると苦しく、起きると楽になる', sig:'r'},
+];
+
+/* ---------- 知識ページ（p2〜p18の内容を選択式で） ---------- */
+const KNOWLEDGE = [
+ {cls:'', ic:'❤️', title:'心不全とは', sub:'はじめに／病の軌跡', html:`
+   <p>心不全は完全に治る病気ではなく、一生つきあいが必要な病気です。<b>入退院を繰り返すほど悪くなる</b>ため、再入院をしないことが肝心です。</p>
+   <p>重症度は「どのくらい元気に動けるか」であり、「心臓がどのくらい動いているか」ではありません。</p>
+   <h4>🩺 心不全のステージ</h4>
+   <div class="stages">
+     <div class="stage a">ステージA<small>リスクあり</small></div>
+     <div class="stage b">ステージB<small>前心不全</small></div>
+     <div class="stage c">ステージC<small>症候性</small></div>
+     <div class="stage d">ステージD<small>治療抵抗性</small></div>
+   </div>
+   <div class="callout">この手帳（アプリ）は、あなたの健康状態を知るための記録です。受診時に医師や看護師、訪問看護師、ケアマネージャーに見せて確認してもらいましょう。</div>
+   <p class="muted">出典：群馬心不全地域連携協議会「心不全健康管理手帳（第四版）」を参考に作成</p>
+ `},
+ {cls:'', ic:'🤝', title:'地域全体で取り組む心不全治療', sub:'みんなであなたを支えます', html:`
+   <p>群馬県では、急性期病院・慢性期病院・心臓リハビリ施設・かかりつけ医・訪問看護などが連携し、地域全体で患者さんを支えています。</p>
+   <p>心不全コントロールには<b>かかりつけ医</b>が欠かせません。あなたは一人ではありません。ただし、再発・悪化を防ぐにはあなた自身の協力も必要です。</p>
+   <h4>🏥 支える人たち</h4>
+   <ul><li>病院医師 / かかりつけ医</li><li>かかりつけ薬局</li><li>心臓リハビリ / 訪問看護</li><li>ケアマネ / 施設</li></ul>
+ `},
+ {cls:'sig', ic:'🚦', title:'心不全の症状と信号', sub:'黄色信号・赤信号を覚える', html:`
+   <p>ポンプ機能が低下すると、血液循環が悪くなり様々な症状が出ます。当てはまる症状を覚えましょう。</p>
+   <h4><span class="pill-tag y">黄色信号</span>数日以内に受診</h4>
+   <ul>
+     <li>急に体重が増える（3日で2kg以上）</li>
+     <li>むくんでくる</li>
+     <li>今まで出来ていたことで息が切れる</li>
+     <li>動悸・夜間頻尿・食欲低下・疲れやすい・手足の冷え</li>
+   </ul>
+   <h4><span class="pill-tag r">赤信号</span>当日受診 or 救急要請</h4>
+   <ul><li>寝ると苦しくなり、起きると（座ると）楽になる（起座呼吸）</li></ul>
+   <div class="callout warn">黄色信号や赤信号が出たら、早めにかかりつけ医に受診しましょう。早期受診は入院を防ぎ、心臓のダメージを軽くします。</div>
+ `},
+ {cls:'', ic:'🏛', title:'心不全治療の4本柱', sub:'自宅での継続が再入院を防ぐ', html:`
+   <p>病院で薬を飲んでいれば悪くならない、というわけではありません。あなた自身が自宅で「治療の4本柱」を継続することが再入院を減らします。</p>
+   <div class="pillars">
+     <div class="pillar l"><span class="pic">🌱</span>日常生活</div>
+     <div class="pillar e"><span class="pic">🚶</span>運動</div>
+     <div class="pillar f"><span class="pic">🍚</span>食事</div>
+     <div class="pillar m"><span class="pic">💊</span>内服</div>
+   </div>
+   <p class="muted">それぞれの詳しい内容は、次の項目をご覧ください。</p>
+ `},
+ {cls:'life', ic:'🌱', title:'1本目の柱：日常生活', sub:'血圧・体重・むくみの自己管理', html:`
+   <h4>🩸 血圧測定</h4>
+   <ul>
+     <li>手首ではなく<b>上腕（二の腕）</b>で測れるものを選ぶ（心臓の高さで正確）</li>
+     <li>1日2回、朝（排尿後・朝食前）と夕（寝る前）の決まった時間に</li>
+     <li>脈拍も一緒に確認</li>
+   </ul>
+   <h4>⚖️ 体重測定</h4>
+   <ul>
+     <li>小数点以下が表示されるデジタル体重計で毎日測る</li>
+     <li>起床後・排尿後に、同じ条件で</li>
+   </ul>
+   <h4>🦵 むくみの観察</h4>
+   <ul>
+     <li>すねや足の甲を10秒押し、指の跡が残るか確認</li>
+     <li>靴下の跡が強く残る・靴がきつい・足首が太いのもサイン</li>
+   </ul>
+ `},
+ {cls:'life', ic:'⚠️', title:'日常生活で気をつけたいこと', sub:'禁煙・節酒・入浴・便通', html:`
+   <h4>🚭 禁煙しましょう</h4>
+   <ul><li>たばこは血管を収縮させ血圧・脈を上げ、不整脈の原因にも</li><li>加熱式・電子たばこも同様に有害。受動喫煙にも注意</li><li>困難なら禁煙外来を活用</li></ul>
+   <h4>🍶 アルコールは控えめに</h4>
+   <ul><li>過剰摂取は血圧上昇・水分過多で心臓の負担に</li><li>飲む場合は<b>アルコール20gが上限</b>（ビール500mL／日本酒1合／ワイン200mL／ウィスキーダブル60mL）</li><li>おつまみは塩分が多いので注意</li></ul>
+   <h4>🛁 心臓にやさしい入浴</h4>
+   <ul><li>お湯は41度まで。長湯しない</li><li>脱衣室・浴室を温めヒートショックを防ぐ</li></ul>
+   <h4>🚽 便通を整える</h4>
+   <ul><li>いきむと血圧が上がる。食物繊維・適度な運動を。必要なら下剤を処方してもらう</li></ul>
+ `},
+ {cls:'life', ic:'💉', title:'予防接種を受けましょう', sub:'感染は心臓の負担に', html:`
+   <p>インフルエンザや肺炎は心臓に大きな負担をかけます。予防接種で心不全の悪化を防ぎましょう。</p>
+   <ul>
+     <li><b>インフルエンザワクチン</b>：主治医と相談し、できるだけ毎年</li>
+     <li><b>肺炎球菌ワクチン</b>：心不全の方は原則接種を</li>
+     <li>新型コロナ・帯状疱疹・RSウイルスワクチンも主治医と相談を</li>
+   </ul>
+ `},
+ {cls:'exercise', ic:'🚶', title:'2本目の柱：運動療法', sub:'動かないと寿命を縮める', html:`
+   <p>安静にしすぎると体力が低下し、かえって寿命を縮めます。適切な運動は「第2の心臓」である筋肉を維持し、自律神経を安定させ、弱った心臓の負担を減らします。</p>
+   <h4>🚲 有酸素運動</h4>
+   <ul><li>歩行・自転車など、息が切れない程度を30分〜1時間</li></ul>
+   <h4>💪 中等度の筋トレ</h4>
+   <ul><li>立ち上がり運動・ゴムバンド・ペットボトルなど無理のない負荷</li><li>自宅で始める前に、心臓リハビリ施設で一度体験を</li></ul>
+   <h4>📋 運動時の注意</h4>
+   <ul><li>退院後は入院中の内容から再開し徐々に増やす。目標は週3回以上</li><li>起床直後・食直後・悪天候・炎天下は避ける</li></ul>
+   <div class="callout warn"><b>運動を中止する時：</b>息切れ・動悸・めまい・むくみ・1週間で2kg以上の体重増加・胸痛・冷や汗・気分不良があるとき</div>
+ `},
+ {cls:'food', ic:'🍚', title:'3本目の柱：食事療法', sub:'減塩は内服と同じくらい大切', html:`
+   <p>食事管理は内服と同じくらい大切です。具体的には<b>塩分制限</b>を。</p>
+   <div class="callout">塩分1gは体に200〜300mLの水を貯めます。心不全では尿として十分に出せず、水分が溜まって心臓の負担になります。</div>
+   <h4>🎯 目標</h4>
+   <ul><li><b>1日6g未満</b>を目標に減塩</li><li>酢・レモン・天然ダシで代用すると満足度アップ</li><li>大さじ1杯：みそ2.2g／しょうゆ2.6gの塩分</li></ul>
+   <p class="muted">詳しい減塩は看護師・管理栄養士に相談しましょう。</p>
+ `},
+ {cls:'med', ic:'💊', title:'4本目の柱：内服治療', sub:'自己調整はしない', html:`
+   <p>弱った心臓の負担を軽くするため、いくつかの内服薬が必要です。医師の指示通りに服用しましょう。</p>
+   <h4>🚫 自己調整はやめる</h4>
+   <ul><li>利尿薬や血圧の薬を、自己判断でやめない</li><li>「トイレが近い」「血圧が高くない」でも勝手に中止しない。心配なら医師に相談</li></ul>
+   <h4>📅 飲み忘れ防止</h4>
+   <ul><li>一包化・お薬カレンダーの活用</li><li>受診時はお薬手帳を必ず持参し、重複を防ぐ</li></ul>
+   <div class="callout">💡 飲み忘れたら：気づいた時点で服用。ただし次の時間が近い／次の時間になった場合は<b>2回分まとめて飲まない</b>。事前に対応をかかりつけ医に確認を。</div>
+ `},
+ {cls:'sig', ic:'❓', title:'心不全Q&A', sub:'水分・薬・かかりつけ医', html:`
+   <h4>Q. 水はあまり飲まない方がいい？</h4>
+   <p>重症の方以外は水分制限はしていません。高齢の方はむしろ不足しがち。<b>1日1000〜1500mL程度</b>は摂取を（個別の指示がある場合はそれに従う）。</p>
+   <h4>Q. 薬を飲み忘れたら？</h4>
+   <p>気づいた時点で服用。次の時間が近い／過ぎた場合は2回分をまとめて飲まないこと。</p>
+   <h4>Q. 心不全を悪くする薬は？</h4>
+   <p>市販の痛み止め（ロキソプロフェン等）、漢方、サプリにも注意が必要なものが。市販薬を使う前に医師・薬剤師に相談を。</p>
+   <h4>Q. 大きな病院でずっと診てほしい</h4>
+   <p>かかりつけ医を持つと、身近な相談役になり、変化に気づきやすく、受診もしやすくなります。悪化時は病院で入院加療と役割分担を。</p>
+ `},
+ {cls:'acp', ic:'🗣', title:'人生会議（ACP）について', sub:'大切にしたいことを話し合う', html:`
+   <p>アドバンス・ケア・プランニング（ACP）とは「自分がどのような治療・ケアを受けるかを、家族や医療者と話し合って共有すること」です。</p>
+   <p>心不全は増悪と改善を繰り返します。悪くなった時に備え、<b>「大切にしたいこと」「してほしくないこと」</b>を、信頼できる人と話し合っておきましょう。</p>
+   <div class="callout">なったばかりの時は不安で考える余裕がないかもしれません。落ち着いた時に、繰り返し考えていきましょう。考えは変わってもかまいません。</div>
+ `},
+ {cls:'acp', ic:'🏷', title:'社会的支援制度', sub:'使える制度を知る', html:`
+   <ul>
+     <li><b>介護保険制度</b>：要介護認定で訪問介護・訪問リハビリ等を1〜3割負担で</li>
+     <li><b>身体障害者手帳</b>：ペースメーカー挿入などで取得できる場合あり</li>
+     <li><b>高額療養費制度</b>：1か月の自己負担が一定額を超えると払い戻し</li>
+     <li><b>難病医療費助成</b>：肥大型・拘束型心筋症などが原因の場合</li>
+   </ul>
+   <div class="callout">活用できる制度がないか、病院のソーシャルワーカーや市町村役場にご相談ください。</div>
+ `},
+];
+
+/* ============================================================
+   データ層
+   ============================================================ */
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return defaultData();
+    const d = JSON.parse(raw);
+    // 前方互換：欠けたキーを補完
+    return Object.assign(defaultData(), d, {records: d.records||{}, settings: Object.assign(defaultData().settings, d.settings||{})});
+  }catch(e){ return defaultData(); }
+}
+function defaultData(){
+  return {
+    schema:1,
+    settings:{name:'', visitWeight:null, baseWeight:null, lastUpdateNoteShown:0},
+    records:{},  // key = 'YYYY-MM-DD'
+    meta:{startDate:null}
+  };
+}
+let DATA = loadData();
+function saveData(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(DATA)); }
+  catch(e){ toast('保存に失敗しました（容量不足の可能性）'); }
+}
+
+/* ============================================================
+   ユーティリティ
+   ============================================================ */
+function todayStr(d){ d=d||new Date(); return d.toISOString().slice(0,10); }
+function fmtMD(s){ const [,m,dd]=s.split('-'); return `${+m}/${+dd}`; }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ============================================================
+   画面遷移
+   ============================================================ */
+function go(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+  window.scrollTo(0,0);
+  if(tab==='home') renderHome();
+  if(tab==='record') initRecordForm();
+  if(tab==='graph') renderGraph();
+  if(tab==='share') renderShare();
+  if(tab==='knowledge') renderKnowledge();
+  if(tab==='data') fillSettings();
+}
+
+/* ============================================================
+   ランク（モチベーション）システム
+   昇格＝連続記載日数 / 降格＝2日連続未記載で1ランクダウン
+   ============================================================ */
+const RANKS = [
+  {key:'none',  name:'未設定', days:0,   ic:'👤'},
+  {key:'beg',   name:'見習い', days:7,   ic:'🌱'},
+  {key:'low',   name:'初級',   days:14,  ic:'🍀'},
+  {key:'mid',   name:'中級',   days:21,  ic:'🌿'},
+  {key:'master',name:'達人',   days:30,  ic:'⭐'},
+  {key:'high',  name:'上級',   days:90,  ic:'🌟'},
+  {key:'meijin',name:'名人',   days:180, ic:'🏅'},
+  {key:'shihan',name:'師範代', days:181, ic:'👑'},
+];
+
+// 記録日付の配列（昇順）
+function recordDates(){ return Object.keys(DATA.records).sort(); }
+
+// 現在の連続記載日数（今日 or 昨日まで途切れていなければ継続中）
+function currentStreak(){
+  const set = new Set(recordDates());
+  if(set.size===0) return 0;
+  const today = todayStr();
+  let anchor;
+  if(set.has(today)) anchor = new Date(today);
+  else{
+    const y = new Date(); y.setDate(y.getDate()-1);
+    if(set.has(todayStr(y))) anchor = y;        // 昨日まで記録あり＝継続中
+    else return 0;                               // 今日も昨日も無い＝途切れ
+  }
+  let streak=0; let cur=new Date(anchor);
+  while(set.has(todayStr(cur))){ streak++; cur.setDate(cur.getDate()-1); }
+  return streak;
+}
+
+// 到達した最高ランクのインデックス（連続記載のピーク）を履歴から算出
+function peakRankIndex(){
+  const dates = recordDates();
+  if(dates.length===0) return 0;
+  let best=0, run=0, prev=null;
+  for(const d of dates){
+    if(prev && daysBetween(prev,d)===1) run++; else run=1;
+    prev=d;
+    best=Math.max(best, rankIndexForDays(run));
+  }
+  return best;
+}
+function rankIndexForDays(days){
+  let idx=0;
+  for(let i=0;i<RANKS.length;i++){ if(days>=RANKS[i].days) idx=i; }
+  return idx;
+}
+
+// 降格回数：記録履歴の中で「2日連続の抜け」が何回起きたか
+function demotionCount(){
+  const dates = recordDates();
+  if(dates.length<2) return 0;
+  let gaps=0;
+  for(let i=1;i<dates.length;i++){
+    const g = daysBetween(dates[i-1], dates[i]) - 1; // 抜けた日数
+    if(g>=2) gaps += Math.floor(g/2);  // 2日抜けるごとに1ランク降格
+  }
+  // 直近の抜け（今日まで）も評価
+  const last = dates[dates.length-1];
+  const gapNow = daysBetween(last, todayStr()) - (recordDates().includes(todayStr())?0:0);
+  const trailing = daysBetween(last, todayStr());
+  if(trailing>=2) gaps += Math.floor(trailing/2);
+  return gaps;
+}
+
+// 現在ランク = min( ピークランク, 連続記載で再達成中ランク ) を考慮し、降格を反映
+function computeRank(){
+  const streak = currentStreak();
+  const liveIdx = rankIndexForDays(streak);          // 今の連続記載で素直に到達するランク
+  const peak    = peakRankIndex();                    // 過去最高
+  const demotes = demotionCount();
+  // 過去最高から降格回数を引いたものと、現在進行中ランクの高い方
+  const afterDemo = Math.max(0, peak - demotes);
+  const idx = Math.max(liveIdx, Math.min(afterDemo, peak));
+  return {idx, rank:RANKS[idx], streak, liveIdx, peak, demotes};
+}
+
+function renderRankUI(){
+  const r = computeRank();
+  document.getElementById('hdrRankName').textContent = r.rank.name;
+  document.querySelector('#hdrRank').firstChild.textContent = r.rank.ic+' ';
+  document.getElementById('heroRank').textContent = r.rank.ic+' '+r.rank.name;
+  document.getElementById('heroStreak').textContent = r.streak;
+  const total = recordDates().length;
+  document.getElementById('heroTotal').textContent = total;
+  // 記載率：開始日〜今日の日数に対する記録日数
+  const start = DATA.meta.startDate;
+  let rate='―';
+  if(start){
+    const span = daysBetween(start, todayStr())+1;
+    if(span>0) rate = Math.round(total/span*100)+'%';
+  }
+  document.getElementById('heroRate').textContent = rate;
+  // ランクトラック
+  const track = document.getElementById('rankTrack');
+  track.innerHTML = RANKS.slice(1).map((rk,i)=>{
+    const realIdx=i+1;
+    const cls = realIdx<r.idx?'done':(realIdx===r.idx?'cur':'');
+    return `<div class="step ${cls}"><div class="dot"></div>${rk.name}</div>`;
+  }).join('');
+}
+
+/* ============================================================
+   信号判定
+   ============================================================ */
+function evaluateSignal(rec, dateStr){
+  // 赤信号：起座呼吸
+  if(rec.symptoms && rec.symptoms.includes('orthopnea')) return {level:'red', label:'赤信号', msg:'その日のうちにかかりつけ医を受診、苦しければ救急要請を'};
+  // 黄色：体重増加（設定値 or 直近からの増加）/ むくみ / 息切れ等
+  let yellow=false; const reasons=[];
+  // 体重：受診すべき体重に到達
+  if(DATA.settings.visitWeight && rec.weight && rec.weight>=DATA.settings.visitWeight){ yellow=true; reasons.push('受診目安体重に到達'); }
+  // 3日で2kg増
+  if(rec.weight && dateStr){
+    const gain = weightGainOver(dateStr, 3);
+    if(gain!=null && gain>=2){ yellow=true; reasons.push('3日で'+gain.toFixed(1)+'kg増'); }
+  }
+  if(rec.symptoms){
+    if(rec.symptoms.includes('weightGain')){yellow=true;reasons.push('体重増加');}
+    if(rec.symptoms.includes('edema')){yellow=true;reasons.push('むくみ');}
+    if(rec.symptoms.includes('dyspnea')){yellow=true;reasons.push('息切れ');}
+    const others=['palpitation','fatigue','appetite','nocturia','cold'].filter(s=>rec.symptoms.includes(s));
+    if(others.length) yellow=true;
+  }
+  if(yellow) return {level:'yellow', label:'黄色信号', msg:'数日以内にかかりつけ医を受診しましょう', reasons};
+  return {level:'green', label:'症状なし', msg:'良い状態です。記録を続けましょう'};
+}
+
+// dateStr時点で、過去n日のうち最小体重からの増加量
+function weightGainOver(dateStr, n){
+  const cur = DATA.records[dateStr];
+  if(!cur || cur.weight==null) return null;
+  let minW = cur.weight;
+  for(let i=1;i<=n;i++){
+    const d=new Date(dateStr); d.setDate(d.getDate()-i);
+    const r=DATA.records[todayStr(d)];
+    if(r && r.weight!=null) minW=Math.min(minW, r.weight);
+  }
+  return cur.weight - minW;
+}
+
+/* ============================================================
+   ホーム
+   ============================================================ */
+function renderHome(){
+  renderRankUI();
+  // 今日の記入状態
+  document.getElementById('todayDone').textContent = DATA.records[todayStr()] ? '記入済み✓' : '未記入';
+  // 最近の記録
+  const dates = recordDates().slice(-5).reverse();
+  const box=document.getElementById('recentList');
+  if(dates.length===0){
+    box.innerHTML='<div class="empty"><div class="ic">🗒</div><p>まだ記録がありません。<br>「今日の記録」から始めましょう。</p></div>';
+  }else{
+    box.innerHTML = dates.map(d=>{
+      const r=DATA.records[d]; const sig=evaluateSignal(r,d);
+      const bcls=sig.level==='red'?'r':sig.level==='yellow'?'y':'g';
+      const w = r.weight!=null?`体重 <b>${r.weight}</b>kg`:'';
+      const bp = r.amSys?` ／ 血圧 <b>${r.amSys}/${r.amDia||'-'}</b>`:'';
+      return `<div class="rec"><div class="d">${fmtMD(d)}</div><div class="v">${w}${bp}</div><span class="badge ${bcls}">${sig.label}</span></div>`;
+    }).join('');
+  }
+  // 更新案内（半年に1回程度）
+  maybeShowUpdateNote();
+}
+
+function maybeShowUpdateNote(){
+  const box=document.getElementById('updateNote');
+  const now=Date.now();
+  const last=DATA.settings.lastUpdateNoteShown||0;
+  const HALF_YEAR=183*86400000;
+  if(DATA.meta.startDate && now-last>HALF_YEAR){
+    box.innerHTML=`<div class="update-note">🔔 新しいバージョンが出ている可能性があります。最新版は配布元にご確認ください。<button class="x" onclick="dismissUpdate()">×</button></div>`;
+  }else box.innerHTML='';
+}
+function dismissUpdate(){ DATA.settings.lastUpdateNoteShown=Date.now(); saveData(); document.getElementById('updateNote').innerHTML=''; }
+
+/* ============================================================
+   記録フォーム
+   ============================================================ */
+function initRecordForm(){
+  // 症状リスト描画
+  const sl=document.getElementById('symptomList');
+  sl.innerHTML = SYMPTOMS.map(s=>`
+    <label class="symptom" data-sig="${s.sig}">
+      <input type="checkbox" value="${s.id}" onchange="onSymptomToggle(this)">
+      <span class="lab">${s.label}</span>
+      <span class="sig ${s.sig}">${s.sig==='r'?'赤':'黄'}</span>
+    </label>`).join('');
+  // 日付：未設定なら今日
+  const dateEl=document.getElementById('recDate');
+  if(!dateEl.value) dateEl.value=todayStr();
+  dateEl.onchange=()=>loadRecordToForm(dateEl.value);
+  loadRecordToForm(dateEl.value);
+}
+function onSymptomToggle(cb){
+  const lab=cb.closest('.symptom');
+  const sig=lab.dataset.sig;
+  lab.classList.toggle('checked', cb.checked);
+  lab.classList.toggle(sig==='r'?'red':'yel', cb.checked);
+  updateLiveSignal();
+}
+function getFormRecord(){
+  const sym=[...document.querySelectorAll('#symptomList input:checked')].map(c=>c.value);
+  const num=id=>{const v=document.getElementById(id).value; return v===''?null:parseFloat(v);};
+  return {
+    amSys:num('amSys'), amDia:num('amDia'), amPulse:num('amPulse'),
+    pmSys:num('pmSys'), pmDia:num('pmDia'), pmPulse:num('pmPulse'),
+    weight:num('weight'),
+    exercise:document.getElementById('exercise').value||null,
+    symptoms:sym,
+    memo:document.getElementById('memo').value.trim()
+  };
+}
+function loadRecordToForm(date){
+  const r=DATA.records[date]||{};
+  const set=(id,v)=>document.getElementById(id).value=(v==null?'':v);
+  set('amSys',r.amSys);set('amDia',r.amDia);set('amPulse',r.amPulse);
+  set('pmSys',r.pmSys);set('pmDia',r.pmDia);set('pmPulse',r.pmPulse);
+  set('weight',r.weight);
+  document.getElementById('exercise').value=r.exercise||'';
+  document.getElementById('memo').value=r.memo||'';
+  document.querySelectorAll('#symptomList input').forEach(cb=>{
+    cb.checked = r.symptoms? r.symptoms.includes(cb.value):false;
+    onSymptomToggle(cb);
+  });
+  updateLiveSignal();
+}
+function updateLiveSignal(){
+  const date=document.getElementById('recDate').value;
+  const rec=getFormRecord();
+  const sig=evaluateSignal(rec,date);
+  const box=document.getElementById('liveSignal');
+  if(sig.level==='green' && (!rec.weight && rec.symptoms.length===0)){ box.innerHTML=''; return; }
+  const ic=sig.level==='red'?'🔴':sig.level==='yellow'?'🟡':'🟢';
+  box.innerHTML=`<div class="signal-banner ${sig.level}"><span class="big">${ic}</span><div><b>${sig.label}</b>${sig.msg}${sig.reasons&&sig.reasons.length?'<br><small>理由: '+sig.reasons.join('、')+'</small>':''}</div></div>`;
+}
+function saveRecord(){
+  const date=document.getElementById('recDate').value;
+  if(!date){ toast('日付を選んでください'); return; }
+  const rec=getFormRecord();
+  const empty = rec.weight==null && rec.amSys==null && rec.pmSys==null && rec.symptoms.length===0 && !rec.memo && !rec.exercise;
+  if(empty){ toast('入力項目がありません'); return; }
+  DATA.records[date]=rec;
+  if(!DATA.meta.startDate || date<DATA.meta.startDate) DATA.meta.startDate=DATA.meta.startDate?Math.min:date;
+  if(!DATA.meta.startDate) DATA.meta.startDate=date;
+  if(date<DATA.meta.startDate) DATA.meta.startDate=date;
+  saveData();
+  const before=computeRank();
+  toast('💾 '+fmtMD(date)+' の記録を保存しました');
+  go('home');
+  // ランクアップ演出
+  setTimeout(()=>{ const after=computeRank(); if(after.idx>before.idx){ toast('🎉 ランクアップ！「'+after.rank.name+'」になりました'); } },400);
+}
+
+/* ============================================================
+   グラフ（Chart.js）
+   ============================================================ */
+let charts={};
+let curRange=14;
+function renderGraph(){
+  document.querySelectorAll('#rangeTabs button').forEach(b=>{
+    b.classList.toggle('on', +b.dataset.r===curRange);
+    b.onclick=()=>{curRange=+b.dataset.r; renderGraph();};
+  });
+  const dates=recordDates();
+  const area=document.getElementById('graphArea');
+  if(dates.length===0){ area.innerHTML='<div class="empty"><div class="ic">📈</div><p>グラフを表示するには<br>記録が必要です。</p></div>'; return; }
+  let use = curRange>0 ? dates.filter(d=>daysBetween(d,todayStr())<curRange) : dates;
+  if(use.length===0) use=dates.slice(-curRange||-9999);
+  const labels=use.map(fmtMD);
+  area.innerHTML=`
+    <div class="chart-box"><h3>⚖️ 体重 (kg)</h3><div class="chart-wrap"><canvas id="cW"></canvas></div></div>
+    <div class="chart-box"><h3>🩸 血圧 (mmHg)</h3><div class="chart-wrap"><canvas id="cBP"></canvas></div></div>
+    <div class="chart-box"><h3>💓 脈拍 (回/分)</h3><div class="chart-wrap"><canvas id="cP"></canvas></div></div>`;
+  Object.values(charts).forEach(c=>c&&c.destroy()); charts={};
+  const g=id=>use.map(d=>DATA.records[d][id]);
+  const baseOpt={responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},
+    plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},scales:{x:{ticks:{font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:7}},y:{ticks:{font:{size:10}}}}};
+
+  // 体重（受診目安ライン付き）
+  const wDatasets=[{label:'体重',data:g('weight'),borderColor:'#e8615a',backgroundColor:'rgba(232,97,90,.12)',tension:.3,spanGaps:true,fill:true,pointRadius:3}];
+  charts.w=new Chart(document.getElementById('cW'),{type:'line',data:{labels,datasets:wDatasets},options:Object.assign({},baseOpt,{
+    plugins:Object.assign({},baseOpt.plugins,{annotation:{}}),
+  })});
+  // 受診目安体重を水平線で（簡易：別データセット）
+  if(DATA.settings.visitWeight){
+    charts.w.data.datasets.push({label:'受診目安',data:labels.map(()=>DATA.settings.visitWeight),borderColor:'#e23b2e',borderDash:[6,4],pointRadius:0,borderWidth:1.5});
+    charts.w.update();
+  }
+  // 血圧
+  charts.bp=new Chart(document.getElementById('cBP'),{type:'line',data:{labels,datasets:[
+    {label:'朝 上',data:g('amSys'),borderColor:'#e8615a',tension:.3,spanGaps:true,pointRadius:2},
+    {label:'朝 下',data:g('amDia'),borderColor:'#f4a9a4',tension:.3,spanGaps:true,pointRadius:2},
+    {label:'夕 上',data:g('pmSys'),borderColor:'#5b9bd5',tension:.3,spanGaps:true,pointRadius:2},
+    {label:'夕 下',data:g('pmDia'),borderColor:'#a9c9e8',tension:.3,spanGaps:true,pointRadius:2},
+  ]},options:baseOpt});
+  // 脈拍
+  charts.p=new Chart(document.getElementById('cP'),{type:'line',data:{labels,datasets:[
+    {label:'朝',data:g('amPulse'),borderColor:'#34a853',tension:.3,spanGaps:true,pointRadius:2},
+    {label:'夕',data:g('pmPulse'),borderColor:'#f0ad4e',tension:.3,spanGaps:true,pointRadius:2},
+  ]},options:baseOpt});
+}
+
+/* ============================================================
+   緊急共有シート
+   ============================================================ */
+function renderShare(){
+  const dates=recordDates();
+  const sheet=document.getElementById('shareSheet');
+  if(dates.length===0){ sheet.innerHTML='<div class="es-body"><div class="empty"><div class="ic">🚨</div><p>共有する記録がありません。</p></div></div>'; return; }
+  const recent=dates.filter(d=>daysBetween(d,todayStr())<30);
+  const use=recent.length?recent:dates.slice(-30);
+  const last=use[use.length-1];
+  const lastRec=DATA.records[last];
+  const sig=evaluateSignal(lastRec,last);
+
+  // 体重トレンド
+  const weights=use.filter(d=>DATA.records[d].weight!=null).map(d=>({d,w:DATA.records[d].weight}));
+  let wNow='—',wTrend='',wTrendCls='flat',wDelta=0;
+  if(weights.length){
+    wNow=weights[weights.length-1].w.toFixed(1);
+    const base=DATA.settings.baseWeight ?? weights[0].w;
+    wDelta=weights[weights.length-1].w-base;
+    wTrend=(wDelta>=0?'+':'')+wDelta.toFixed(1)+'kg '+(DATA.settings.baseWeight?'(基準比)':'(期間比)');
+    wTrendCls=Math.abs(wDelta)>=2?'up':'flat';
+  }
+  // 血圧平均（直近7日）
+  const last7=use.filter(d=>daysBetween(d,todayStr())<7);
+  const avg=(arr)=>{const v=arr.filter(x=>x!=null);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;};
+  const sysAvg=avg(last7.map(d=>DATA.records[d].amSys));
+  const diaAvg=avg(last7.map(d=>DATA.records[d].amDia));
+  const pulseAvg=avg(last7.map(d=>DATA.records[d].amPulse));
+
+  // 症状集計（直近2週間）
+  const symWindow=use.filter(d=>daysBetween(d,todayStr())<14);
+  const symCount={};
+  symWindow.forEach(d=>(DATA.records[d].symptoms||[]).forEach(s=>symCount[s]=(symCount[s]||0)+1));
+  const symChips=Object.entries(symCount).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{
+    const def=SYMPTOMS.find(s=>s.id===id);
+    return `<span class="es-symptom-chip ${def.sig==='r'?'r':''}">${def.label.replace(/（.*?）/,'')} ×${n}</span>`;
+  }).join('') || '<span class="muted">特記すべき症状なし</span>';
+
+  const name=DATA.settings.name||'（名前未設定）';
+  const sigCls=sig.level, sigIc=sig.level==='red'?'🔴':sig.level==='yellow'?'🟡':'🟢';
+  const visitW=DATA.settings.visitWeight?`受診目安 ${DATA.settings.visitWeight}kg`:'';
+
+  sheet.innerHTML=`
+    <div class="es-head">
+      <div class="nm">${name}</div>
+      <div class="sub">心不全 体調サマリー ／ ${fmtMD(use[0])}〜${fmtMD(last)}（${use.length}日間）</div>
+    </div>
+    <div class="es-body">
+      <div class="es-signal ${sigCls}" style="background:${sigCls==='red'?'var(--red-bg)':sigCls==='yellow'?'var(--yellow-bg)':'var(--green-bg)'};color:${sigCls==='red'?'var(--red-sig)':sigCls==='yellow'?'#9a6b00':'#1f7a37'}">
+        <div class="lv">${sigIc} ${sig.label}</div>
+        <div class="ms">${sig.msg}</div>
+      </div>
+      <div class="es-grid">
+        <div class="es-metric"><div class="l">現在の体重</div><div class="v">${wNow}<small>kg</small></div><div class="trend ${wTrendCls}">${wTrend}</div><div class="muted" style="font-size:10px">${visitW}</div></div>
+        <div class="es-metric"><div class="l">血圧 (朝・7日平均)</div><div class="v">${sysAvg??'—'}<small>/${diaAvg??'—'}</small></div><div class="trend flat">脈拍 ${pulseAvg??'—'}/分</div></div>
+      </div>
+      <div class="es-section">
+        <div class="st">体重の推移</div>
+        <canvas class="mini-spark" id="sparkW"></canvas>
+      </div>
+      <div class="es-section">
+        <div class="st">直近2週間の症状</div>
+        ${symChips}
+      </div>
+      ${lastRec.memo?`<div class="es-section"><div class="st">メモ</div><div class="muted">${lastRec.memo}</div></div>`:''}
+    </div>
+    <div class="es-foot">心不全健康管理手帳 Web版で記録 ／ 作成 ${fmtMD(todayStr())}　※医療判断は主治医にご相談ください</div>
+  `;
+  // スパークライン
+  setTimeout(()=>{
+    if(charts.spark)charts.spark.destroy();
+    const wl=weights.map(x=>x.w), ll=weights.map(x=>fmtMD(x.d));
+    if(wl.length){
+      charts.spark=new Chart(document.getElementById('sparkW'),{type:'line',data:{labels:ll,datasets:[
+        {data:wl,borderColor:'#e8615a',backgroundColor:'rgba(232,97,90,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2},
+        ...(DATA.settings.visitWeight?[{data:ll.map(()=>DATA.settings.visitWeight),borderColor:'#e23b2e',borderDash:[5,3],pointRadius:0,borderWidth:1}]:[])
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{font:{size:9}}}}}});
+    }
+  },50);
+}
+
+async function downloadShareImage(){
+  toast('画像を生成中…');
+  try{
+    if(typeof html2canvas==='undefined'){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    const el=document.getElementById('shareSheet');
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#fff',useCORS:true});
+    const link=document.createElement('a');
+    link.download='心不全体調サマリー_'+todayStr()+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('🖼 画像を保存しました');
+  }catch(e){ toast('画像生成に失敗しました。スクリーンショットをご利用ください'); }
+}
+
+/* ============================================================
+   知識ページ
+   ============================================================ */
+function renderKnowledge(){
+  const list=document.getElementById('knowledgeList');
+  if(list.dataset.done) return;
+  list.innerHTML=KNOWLEDGE.map((k,i)=>`
+    <li class="k-item ${k.cls}" id="k${i}">
+      <div class="k-item-head" onclick="toggleK(${i})">
+        <span class="ic">${k.ic}</span>
+        <span class="tt">${k.title}<small>${k.sub}</small></span>
+        <span class="arr">▶</span>
+      </div>
+      <div class="k-body"><div class="k-body-inner">${k.html}</div></div>
+    </li>`).join('');
+  list.dataset.done='1';
+}
+function toggleK(i){ document.getElementById('k'+i).classList.toggle('open'); }
+
+/* ============================================================
+   設定
+   ============================================================ */
+function fillSettings(){
+  document.getElementById('setName').value=DATA.settings.name||'';
+  document.getElementById('setVisitWeight').value=DATA.settings.visitWeight??'';
+  document.getElementById('setBaseWeight').value=DATA.settings.baseWeight??'';
+}
+function saveSettings(){
+  DATA.settings.name=document.getElementById('setName').value.trim();
+  const vw=document.getElementById('setVisitWeight').value;
+  const bw=document.getElementById('setBaseWeight').value;
+  DATA.settings.visitWeight=vw===''?null:parseFloat(vw);
+  DATA.settings.baseWeight=bw===''?null:parseFloat(bw);
+  saveData();
+  toast('⚙️ 設定を保存しました');
+  renderRankUI();
+}
+function openSettings(){ go('data'); }
+
+/* ============================================================
+   データ入出力
+   ============================================================ */
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  download(blob,'心不全手帳バックアップ_'+todayStr()+'.json');
+  toast('📦 JSONを書き出しました');
+}
+function exportCSV(){
+  const dates=recordDates();
+  if(dates.length===0){toast('記録がありません');return;}
+  const head=['日付','朝収縮期','朝拡張期','朝脈拍','夕収縮期','夕拡張期','夕脈拍','体重kg','運動','症状','信号','メモ'];
+  const rows=dates.map(d=>{
+    const r=DATA.records[d];const sig=evaluateSignal(r,d);
+    const syms=(r.symptoms||[]).map(s=>SYMPTOMS.find(x=>x.id===s)?.label||s).join(' / ');
+    return [d,r.amSys,r.amDia,r.amPulse,r.pmSys,r.pmDia,r.pmPulse,r.weight,r.exercise==='yes'?'○':r.exercise==='no'?'×':'',`"${syms}"`,sig.label,`"${(r.memo||'').replace(/"/g,'""')}"`].map(v=>v==null?'':v).join(',');
+  });
+  const csv='\uFEFF'+[head.join(','),...rows].join('\n'); // BOM付きでExcel文字化け防止
+  download(new Blob([csv],{type:'text/csv'}),'心不全手帳_'+todayStr()+'.csv');
+  toast('📊 CSVを書き出しました');
+}
+function download(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importJSON(ev){
+  const file=ev.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imp=JSON.parse(e.target.result);
+      if(!imp.records){throw new Error('形式が違います');}
+      const cnt=Object.keys(imp.records).length;
+      if(confirm(`${cnt}日分の記録を読み込みます。現在の記録と統合しますか？\n（同じ日付は読み込んだ内容で上書きされます）`)){
+        DATA.records=Object.assign({}, DATA.records, imp.records);
+        if(imp.settings) DATA.settings=Object.assign(DATA.settings, imp.settings);
+        const all=recordDates();
+        if(all.length) DATA.meta.startDate = all[0];
+        saveData(); toast('📥 '+cnt+'日分を読み込みました'); go('home');
+      }
+    }catch(err){ toast('読み込みに失敗：'+err.message); }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+function confirmReset(){
+  if(confirm('本当にすべての記録を消去しますか？この操作は取り消せません。\n先にJSONで書き出してバックアップすることをおすすめします。')){
+    if(confirm('最終確認：すべてのデータを削除します。よろしいですか？')){
+      localStorage.removeItem(STORE_KEY); DATA=defaultData(); saveData();
+      toast('データを消去しました'); go('home');
+    }
+  }
+}
+
+/* ============================================================
+   PWA: manifest と Service Worker を inline 埋め込み
+   （単一HTMLファイルのまま、HTTPS配信ならホーム追加可能）
+   ============================================================ */
+function setupPWA(){
+  // manifest を Blob で生成して link 注入
+  const manifest={
+    name:'心不全健康管理手帳', short_name:'心不全手帳',
+    start_url:'.', scope:'.', display:'standalone',
+    background_color:'#fdeef0', theme_color:'#e8615a',
+    icons:[{src:iconDataURI(192),sizes:'192x192',type:'image/png'},{src:iconDataURI(512),sizes:'512x512',type:'image/png'}]
+  };
+  const mBlob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const mLink=document.createElement('link');mLink.rel='manifest';mLink.href=URL.createObjectURL(mBlob);
+  document.head.appendChild(mLink);
+  // apple touch icon
+  const al=document.createElement('link');al.rel='apple-touch-icon';al.href=iconDataURI(180);document.head.appendChild(al);
+  // Service Worker（同一HTMLをキャッシュしオフライン化）— HTTPS配信時のみ動作
+  if('serviceWorker' in navigator && location.protocol==='https:'){
+    const swCode=`
+      const C='hf-techo-v1';
+      self.addEventListener('install',e=>{self.skipWaiting();});
+      self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});
+      self.addEventListener('fetch',e=>{
+        if(e.request.method!=='GET')return;
+        e.respondWith(
+          caches.open(C).then(c=>c.match(e.request).then(r=>{
+            const f=fetch(e.request).then(resp=>{try{c.put(e.request,resp.clone());}catch(_){}return resp;}).catch(()=>r);
+            return r||f;
+          }))
+        );
+      });`;
+    const swBlob=new Blob([swCode],{type:'text/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+  }
+}
+// シンプルなハート型アイコンを Canvas で生成
+function iconDataURI(size){
+  const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
+  x.fillStyle='#fdeef0';x.fillRect(0,0,size,size);
+  x.fillStyle='#e8615a';
+  const s=size*0.5, cx=size/2, cy=size*0.46;
+  x.beginPath();
+  x.moveTo(cx,cy+s*0.35);
+  x.bezierCurveTo(cx-s*0.6,cy-s*0.1, cx-s*0.5,cy-s*0.55, cx,cy-s*0.2);
+  x.bezierCurveTo(cx+s*0.5,cy-s*0.55, cx+s*0.6,cy-s*0.1, cx,cy+s*0.35);
+  x.fill();
+  return c.toDataURL('image/png');
+}
+
+/* ============================================================
+   初期化
+   ============================================================ */
+function init(){
+  setupPWA();
+  renderHome();
+  // 初回起動日記録（記載率の分母用ではなく案内タイマー用）
+  if(!DATA.settings.lastUpdateNoteShown){ DATA.settings.lastUpdateNoteShown=Date.now(); saveData(); }
+}
+init();
+
+</script>
+</body>
+</html>
